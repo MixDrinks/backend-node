@@ -1,0 +1,5 @@
+# List
+GET http://localhost:3000/api/blog/post-list
+
+### Details
+GET http://localhost:3000/api/blog/post-details/test
