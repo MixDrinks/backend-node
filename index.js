@@ -9,5 +9,5 @@ const port = process.env.APP_PORT;
 app.use(postDetailsRoutes, postListRoutes);
 
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}/`);
+  console.log(`Server running at http://localhost:${port}/`);
 });
