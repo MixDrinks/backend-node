@@ -10,15 +10,15 @@ const dbName = process.env.DB_NAME;
 const uri = `mongodb://${dbUser}:${dbPassword}@${dbHost}:${dbPort}`;
 
 mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    dbName: dbName,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  dbName: dbName,
 });
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () {
-    console.log('We are connected to MongoDB!');
+db.once('open', function() {
+  console.log('We are connected to MongoDB!');
 });
 
 module.exports = mongoose;
