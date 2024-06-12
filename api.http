@@ -1,5 +1,5 @@
 # List
-GET http://localhost:3000/api/blog/post-list
+GET http://localhost:3000/api/blog/post-list?page=2
 
 ### Details
 GET http://localhost:3000/api/blog/post-details/test
