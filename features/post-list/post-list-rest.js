@@ -12,7 +12,7 @@ router.get('/api/blog/post-list', async (req, res) => {
         .limit(pageSize)
         .exec()
 
-    const pageCount = Math.ceil(await Blog.countDocuments() / pageSize);
+    const postCount = await Blog.countDocuments();
 
     if (!result) {
         res.status(404).send('No blog found');
@@ -20,7 +20,7 @@ router.get('/api/blog/post-list', async (req, res) => {
 
     res.status(200).json({
         posts: result,
-        pageCount: pageCount
+        postCount: postCount,
     });
 });
 
