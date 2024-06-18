@@ -3,7 +3,7 @@ const {Blog} = require('../../database/schemas');
 const router = express.Router();
 
 router.get('/api/blog/post-list', async (req, res) => {
-    const page = req.query.page || 0;
+    const page = req.query.page ? parseInt(req.query.page) : 0
     const pageSize = 12
 
     const result = await Blog.find({}, 'title slug image')

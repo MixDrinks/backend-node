@@ -1,5 +1,5 @@
 # List
-GET http://api.mixdrinks.org/api/blog/post-list?page=1
+GET http://localhost:3000/api/blog/post-list?page=1
 
 ### Details
 GET http://localhost:3000/api/blog/post-details/test
