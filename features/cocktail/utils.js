@@ -1,20 +1,14 @@
-require('dotenv').config();
 const {buildImages} = require("../../utils/image");
-const Cocktail = require("../../database/cocktail");
-const express = require('express')
-const router = express.Router();
+const {getCocktailBySlug} = require("../../database/cocktail");
 
-router.get('/api/cocktail/:slug', async (req, res) => {
-  const slug = req.params.slug;
-
+async function getFullCocktailBySlug(slug) {
   try {
-    const cocktail = await Cocktail.getCocktailBySlug(slug);
+    const cocktail = await getCocktailBySlug(slug);
 
     if (!cocktail) {
-      return res.status(404).json({message: "Cocktail not found"});
+      return null;
     }
 
-    // Add images to the cocktail and goods
     const cocktailImages = buildImages(cocktail.id, 'COCKTAIL');
     const goods = cocktail.goods.map(good => ({
       id: good.id,
@@ -62,7 +56,7 @@ router.get('/api/cocktail/:slug', async (req, res) => {
     }
 
     // Transform the data to match the existing response structure
-    const response = {
+    return {
       id: cocktail.id,
       slug: cocktail.slug,
       name: cocktail.name,
@@ -75,12 +69,11 @@ router.get('/api/cocktail/:slug', async (req, res) => {
       tools: glassware.concat(tools),
       tags: taste.concat(tags),
     };
-
-    res.json(response);
   } catch (error) {
-    console.error("Error fetching cocktail:", error);
-    res.status(500).json({message: "Internal server error"});
+    return null;
   }
-});
+}
 
-module.exports = router;
+module.exports = {
+  getFullCocktailBySlug,
+};

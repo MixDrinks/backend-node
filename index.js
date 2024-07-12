@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const postListRoutes = require('./features/post-list/post-list-rest');
 const postDetailsRoutes = require('./features/post-list/post-details-rest');
-const cocktailDetails = require('./features/cocktail/details');
+const cocktailDetails = require('./features/cocktail/rest');
 
 const app = express();
 const port = process.env.APP_PORT;
