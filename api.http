@@ -1,11 +1,8 @@
-# List
-GET http://api.mixdrinks.org/api/blog/post-list?page=1
-
-### Details
-GET http://localhost:3000/api/blog/post-details/test
+### List
+GET https://newapi.mixdrinks.org/api/blog/post-list?page=0
 
 ### Details 2
-GET http://localhost:3000/api/blog/post-details/piatdesiati-v-Skliantsi-10-Kultovykh-kokteiliv-yaki-pidkoryly-ameryku
+GET http://localhost:3000/api/blog/post-details/pzFKfi-top-5-cocktailiv-ameryky
 
-### Details prod ip
-GET https://api.mixdrinks.org/api/blog/post-details/piatdesiati-v-Skliantsi-10-Kultovykh-kokteiliv-yaki-pidkoryly-ameryku
+### GET cocktail
+GET http://localhost:3000/api/cocktail/modernistskyi-falafel

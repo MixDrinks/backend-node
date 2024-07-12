@@ -1,14 +1,17 @@
 require('dotenv').config();
-const express = require("express");
+const express = require('express')
 const axios = require('axios');
-const { Blog } = require('../../database/schemas');
+const {Blog} = require('../../database/schemas');
 const router = express.Router();
 
 const oldApiHost = process.env.OLD_API_HOST;
 
-router.get('/api/blog/post-details/:slug', (req, res) => {
+router.get('/api/blog/post-details/:slug', async (req, res) => {
   const slug = req.params.slug;
-  Blog.findOne({ slug: slug }, async (err, blog) => {
+
+  console.log(`Fetching blog post details for slug ${slug}`);
+
+  Blog.findOne({slug: slug}, async (err, blog) => {
     if (err) {
       console.log(err)
       res.status(500).send(err);
@@ -34,7 +37,7 @@ router.get('/api/blog/post-details/:slug', (req, res) => {
       response.responseTime = new Date(); // Add the responseTime field
       res.status(200).json(response);
     }
-    });
+  });
 });
 
 module.exports = router;
