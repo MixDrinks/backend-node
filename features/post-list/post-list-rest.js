@@ -3,12 +3,12 @@ const express = require('express')
 const router = express.Router();
 
 router.get('/api/blog/post-list', async (req, res) => {
-  const page = req.query.page || 1;
+  const page = req.query.page ? parseInt(req.query.page) : 0
   const pageSize = 12
 
   const result = await Blog.find({}, 'title slug image')
     .sort({published_at: -1})
-    .skip((page - 1) * pageSize)
+    .skip(page * pageSize)
     .limit(pageSize)
     .exec()
 
