@@ -8,6 +8,7 @@ const cocktailDetails = require('./features/cocktail/rest');
 const service = require('./features/service');
 const glasswareDetails = require('./features/glassware/rest');
 const toolDetails = require('./features/tools/rest');
+const goodDetails = require('./features/goods/rest');
 
 const app = express();
 const port = process.env.APP_PORT;
@@ -27,6 +28,7 @@ app.use(
   cocktailDetails,
   glasswareDetails,
   toolDetails,
+  goodDetails,
   service
 );
 
