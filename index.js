@@ -6,6 +6,7 @@ const postListRoutes = require('./features/post-list/post-list-rest');
 const postDetailsRoutes = require('./features/post-list/post-details-rest');
 const cocktailDetails = require('./features/cocktail/rest');
 const service = require('./features/service');
+const glasswareDetails = require('./features/glassware/rest');
 
 const app = express();
 const port = process.env.APP_PORT;
@@ -19,7 +20,7 @@ app.use(cors({
   optionsSuccessStatus: 204,
 }));
 
-app.use(postListRoutes, postDetailsRoutes, cocktailDetails, service);
+app.use(postListRoutes, postDetailsRoutes, cocktailDetails, glasswareDetails, service);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);

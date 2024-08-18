@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express')
-const {getFullCocktailBySlug} = require("./utils");
+const { getFullCocktailBySlug } = require("./utils");
 const router = express.Router();
 
 router.get('/api/cocktail/:slug', async (req, res) => {

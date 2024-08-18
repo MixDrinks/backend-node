@@ -1,5 +1,5 @@
-const {buildImages} = require("../../utils/image");
-const {getCocktailBySlug} = require("../../database/cocktail");
+const { buildImages } = require("../../utils/image");
+const { getCocktailBySlug } = require("../../database/cocktail");
 
 async function getFullCocktailBySlug(slug) {
   try {
@@ -55,7 +55,6 @@ async function getFullCocktailBySlug(slug) {
       ratting = null;
     }
 
-    // Transform the data to match the existing response structure
     return {
       id: cocktail.id,
       slug: cocktail.slug,
