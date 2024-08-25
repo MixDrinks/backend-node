@@ -25,7 +25,7 @@ router.post('/api/cocktail/:slug/visit', async (req, res) => {
   if (!scoreInfo) {
     return res.status(404).send('Cocktail not found');
   } else {
-    return res.status(204).send();
+    return res.status(200).send({ 'slug': slug });
   }
 });
 
