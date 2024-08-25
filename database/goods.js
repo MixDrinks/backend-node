@@ -1,4 +1,3 @@
-
 const Database = require('./newclient');
 
 function getGoodBySlug(slug) {
