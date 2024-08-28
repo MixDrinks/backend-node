@@ -13,6 +13,20 @@ async function addVisitToCocktail(slug) {
   );
 }
 
+async function addRatingToCocktail(slug, rating) {
+  return Database.collection('cocktails').updateOne(
+    {
+      'slug': slug
+    },
+    {
+      $inc: {
+        'ratingCount': 1,
+        'ratingValue': rating
+      }
+    }
+  );
+}
+
 async function getScoreInfo(slug) {
   const rawScoreInfo = Database.collection('cocktails').findOne(
     {
@@ -34,5 +48,6 @@ async function getScoreInfo(slug) {
 
 module.exports = {
   addVisitToCocktail,
+  addRatingToCocktail,
   getScoreInfo
 };

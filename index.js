@@ -23,6 +23,8 @@ app.use(cors({
   optionsSuccessStatus: 204,
 }));
 
+app.use(express.json());
+
 app.use(
   postListRoutes,
   postDetailsRoutes,
