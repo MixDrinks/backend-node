@@ -1,4 +1,3 @@
-
 const Database = require('./newclient');
 
 async function addVisitToCocktail(slug) {

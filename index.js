@@ -9,6 +9,7 @@ const service = require('./features/service');
 const glasswareDetails = require('./features/glassware/rest');
 const toolDetails = require('./features/tools/rest');
 const goodDetails = require('./features/goods/rest');
+const filter = require('./features/filters/rest');
 
 const app = express();
 const port = process.env.APP_PORT;
@@ -29,6 +30,7 @@ app.use(
   glasswareDetails,
   toolDetails,
   goodDetails,
+  filter,
   service
 );
 
