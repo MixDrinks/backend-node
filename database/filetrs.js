@@ -125,6 +125,9 @@ async function buildFutureCounter(inputFilters, filterKey, collectionName) {
 
     const futureFilter = { ...filters, [filterKey]: theFilterValue };
 
+    const futureSelectedFilterCount = Object.keys(futureFilter).reduce((acc, key) => acc + futureFilter[key].length, 0);
+    const isAddToIndex = futureSelectedFilterCount < 3;
+
     const count = await getCocktailCountByFilter(futureFilter);
 
     return {
@@ -132,6 +135,7 @@ async function buildFutureCounter(inputFilters, filterKey, collectionName) {
       query: filterToPath(futureFilter),
       count: count,
       isActive: isInclude,
+      isAddToIndex: isAddToIndex,
     };
   }));
 
@@ -154,6 +158,9 @@ async function getCocktailFilterState(filters, skip, limit, sortType) {
     buildFutureCounter(filters, 'tags', 'tags')
   ]);
 
+  const selectedFilterCount = Object.keys(filters).reduce((acc, key) => acc + filters[key].length, 0);
+  const isAddToIndex = selectedFilterCount < 3;
+
   return {
     totalCount,
     cocktails,
@@ -164,7 +171,8 @@ async function getCocktailFilterState(filters, skip, limit, sortType) {
       3: toolsFuture,
       4: goodsFuture,
       5: tagsFuture,
-    }
+    },
+    isAddToIndex: isAddToIndex,
   }
 }
 
