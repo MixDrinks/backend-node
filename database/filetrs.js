@@ -27,6 +27,10 @@ function buildFilterQuery(filters) {
 }
 
 async function getCocktailCountByFilter(filters) {
+  // return the total count of cocktails in case of no filters, or all filter arrays are empty
+  if (Object.keys(filters).every(key => filters[key].length === 0)) {
+    return await Database.collection('cocktails').countDocuments();
+  }
   const filterQuery = buildFilterQuery(filters);
 
   const totalCount = await Database.collection('cocktails').countDocuments(filterQuery);
