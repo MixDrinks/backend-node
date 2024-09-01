@@ -191,12 +191,12 @@ async function getCocktailFilterState(filters, skip, limit, sortType) {
     totalCount,
     cocktails,
     futureCounts: {
-      //0: tagsFuture,
-      //1: goodsFuture,
-      //2: toolsFuture,
-      //3: tasteFuture,
+      0: tagsFuture,
+      1: goodsFuture,
+      2: toolsFuture,
+      3: tasteFuture,
       4: alcoholVolumeFuture,
-      //5: glasswareFuture,
+      5: glasswareFuture,
     },
     isAddToIndex: isAddToIndex,
   }
