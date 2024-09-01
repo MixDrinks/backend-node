@@ -31,7 +31,14 @@ async function getCocktailCountByFilter(filters) {
   if (Object.keys(filters).every(key => filters[key].length === 0)) {
     return await Database.collection('cocktails').countDocuments();
   }
-  const filterQuery = buildFilterQuery(filters);
+  let fiterWithoutEmptyArrays = {};
+  Object.keys(filters).forEach((key) => {
+    if (filters[key].length > 0) {
+      fiterWithoutEmptyArrays[key] = filters[key];
+    }
+  });
+  // copy filter remove all empty arrays
+  const filterQuery = buildFilterQuery(fiterWithoutEmptyArrays);
 
   const totalCount = await Database.collection('cocktails').countDocuments(filterQuery);
   return totalCount;
@@ -127,12 +134,27 @@ async function buildFutureCounter(inputFilters, filterKey, collectionName) {
       theFilterValue.push(filterValue.slug);
     }
 
+    if (filterKey === 'alcohol-volume') {
+      console.log('1');
+      console.log(theFilterValue);
+
+      console.log('the fiter  value ', filterValue.slug);
+    }
+
     const futureFilter = { ...filters, [filterKey]: theFilterValue };
+
+    if (filterKey === 'alcohol-volume') {
+      console.log(futureFilter);
+    }
 
     const futureSelectedFilterCount = Object.keys(futureFilter).reduce((acc, key) => acc + futureFilter[key].length, 0);
     const isAddToIndex = futureSelectedFilterCount < 3;
 
     const count = await getCocktailCountByFilter(futureFilter);
+
+    if (filterKey === 'alcohol-volume') {
+      console.log('count', count);
+    }
 
     return {
       id: filterValue.id,
@@ -169,12 +191,12 @@ async function getCocktailFilterState(filters, skip, limit, sortType) {
     totalCount,
     cocktails,
     futureCounts: {
-      0: tagsFuture,
-      1: goodsFuture,
-      2: toolsFuture,
-      3: tasteFuture,
+      //0: tagsFuture,
+      //1: goodsFuture,
+      //2: toolsFuture,
+      //3: tasteFuture,
       4: alcoholVolumeFuture,
-      5: glasswareFuture,
+      //5: glasswareFuture,
     },
     isAddToIndex: isAddToIndex,
   }
