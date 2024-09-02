@@ -13,7 +13,10 @@ const client = new MongoClient(mongoUrl, {
 
 client.connect()
   .then(() => console.log('Connected to MongoDB'))
-  .catch(e => console.error(e))
+  .catch(e => {
+    console.error('Failed to connect to MongoDB:', e);
+    process.exit(1);  // Exit the application with a failure code
+  });
 
 const Database = client.db()
 
