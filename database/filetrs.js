@@ -141,10 +141,6 @@ async function buildFutureCounter(inputFilters, filterKey, collectionName) {
 
     const count = await getCocktailCountByFilter(futureFilter);
 
-    if (filterKey === 'alcohol-volume') {
-      console.log('count', count);
-    }
-
     return {
       id: filterValue.id,
       query: filterToPath(futureFilter),
