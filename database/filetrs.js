@@ -134,27 +134,12 @@ async function buildFutureCounter(inputFilters, filterKey, collectionName) {
       theFilterValue.push(filterValue.slug);
     }
 
-    if (filterKey === 'alcohol-volume') {
-      console.log('1');
-      console.log(theFilterValue);
-
-      console.log('the fiter  value ', filterValue.slug);
-    }
-
     const futureFilter = { ...filters, [filterKey]: theFilterValue };
-
-    if (filterKey === 'alcohol-volume') {
-      console.log(futureFilter);
-    }
 
     const futureSelectedFilterCount = Object.keys(futureFilter).reduce((acc, key) => acc + futureFilter[key].length, 0);
     const isAddToIndex = futureSelectedFilterCount < 3;
 
     const count = await getCocktailCountByFilter(futureFilter);
-
-    if (filterKey === 'alcohol-volume') {
-      console.log('count', count);
-    }
 
     return {
       id: filterValue.id,
