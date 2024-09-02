@@ -8,7 +8,6 @@ const mongoUrl = process.env.DB_URL
 const client = new MongoClient(mongoUrl, {
   socketTimeoutMS: 10000,
   connectTimeoutMS: 10000,
-  readPreference: 'nearest',
 });
 
 client.connect()
