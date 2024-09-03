@@ -1,56 +1,89 @@
 const Database = require('./newclient');
 const { buildImages } = require("../utils/image");
 
-function buildFilterQuery(filters) {
-  const filterQuery = {};
+const filterCache = {
+  alcoholVolumes: {},
+  tastes: {},
+  glassware: {},
+  goods: {},
+  tools: {},
+  tags: {},
+};
 
-  if (filters['alcohol-volume']) {
-    filterQuery['alcoholVolumes.slug'] = { $all: filters['alcohol-volume'] };
-  }
-  if (filters['taste']) {
-    filterQuery['tastes.slug'] = { $all: filters['taste'] };
-  }
-  if (filters['glassware']) {
-    filterQuery['glassware.slug'] = { $all: filters['glassware'] };
-  }
-  if (filters['goods']) {
-    filterQuery['goods.slug'] = { $all: filters['goods'] };
-  }
-  if (filters['tools']) {
-    filterQuery['tools.slug'] = { $all: filters['tools'] };
-  }
-  if (filters['tags']) {
-    filterQuery['tags.slug'] = { $all: filters['tags'] };
-  }
+const filterSlugToIdMap = {}
 
-  return filterQuery;
+const keyMapping = {
+  'alcohol-volume': 'alcoholVolumes',
+  taste: 'tastes',
+  glassware: 'glassware',
+  goods: 'goods',
+  tools: 'tools',
+  tags: 'tags',
+};
+
+async function initializeFilterCache() {
+  const alcoholVolumes = await Database.collection('alcoholVolumes').find().toArray();
+  const tastes = await Database.collection('tastes').find().toArray();
+  const glassware = await Database.collection('glassware').find().toArray();
+  const goods = await Database.collection('goods').find().toArray();
+  const tools = await Database.collection('tools').find().toArray();
+  const tags = await Database.collection('tags').find().toArray();
+
+  alcoholVolumes.forEach(av => filterCache.alcoholVolumes[av.slug] = new Set(av.cocktailSlugs));
+  tastes.forEach(taste => filterCache.tastes[taste.slug] = new Set(taste.cocktailSlugs));
+  glassware.forEach(gw => filterCache.glassware[gw.slug] = new Set(gw.cocktailSlugs));
+  goods.forEach(good => filterCache.goods[good.slug] = new Set(good.cocktailSlugs));
+  tools.forEach(tool => filterCache.tools[tool.slug] = new Set(tool.cocktailSlugs));
+  tags.forEach(tag => filterCache.tags[tag.slug] = new Set(tag.cocktailSlugs));
+
+  alcoholVolumes.forEach(av => filterSlugToIdMap[av.slug] = av.id);
+  tastes.forEach(taste => filterSlugToIdMap[taste.slug] = taste.id);
+  glassware.forEach(gw => filterSlugToIdMap[gw.slug] = gw.id);
+  goods.forEach(good => filterSlugToIdMap[good.slug] = good.id);
+  tools.forEach(tool => filterSlugToIdMap[tool.slug] = tool.id);
+  tags.forEach(tag => filterSlugToIdMap[tag.slug] = tag.id);
+
+  console.log("Filter cache initialized");
+}
+
+function getCocktailIds(searchParams) {
+  if (Object.keys(searchParams).length === 0) throw new Error("Filters must not be empty");
+
+  return Object.entries(searchParams)
+    .map(([filterGroup, filterIds]) => {
+      if (filterIds.length === 0) throw new Error(`Filter group ${filterGroup} must not be empty`);
+
+      const mappedKey = keyMapping[filterGroup];
+      const selectedFilters = filterIds.map(id => filterCache[mappedKey][id] || new Set());
+
+      if (selectedFilters.length === 0) {
+        throw new Error(`Filter group ${mappedKey} is empty or does not contain filter ids ${filterIds}`);
+      }
+
+      return selectedFilters.reduce((acc, cocktailSlugs) => {
+        return new Set([...acc].filter(slug => cocktailSlugs.has(slug)));
+      });
+    })
+    .reduce((acc, cocktailSlugs) => {
+      return new Set([...acc].filter(slug => cocktailSlugs.has(slug)));
+    });
 }
 
 async function getCocktailCountByFilter(filters) {
-  // return the total count of cocktails in case of no filters, or all filter arrays are empty
   if (Object.keys(filters).every(key => filters[key].length === 0)) {
     return await Database.collection('cocktails').countDocuments();
   }
-  let fiterWithoutEmptyArrays = {};
-  Object.keys(filters).forEach((key) => {
-    if (filters[key].length > 0) {
-      fiterWithoutEmptyArrays[key] = filters[key];
-    }
-  });
-  // copy filter remove all empty arrays
-  const filterQuery = buildFilterQuery(fiterWithoutEmptyArrays);
 
-  const totalCount = await Database.collection('cocktails').countDocuments(filterQuery);
-  return totalCount;
+  const cocktailIds = getCocktailIds(filters);
+  return cocktailIds.size;
 }
 
 async function getCocktailSubsetByFilter(filters, skip, limit, sortType = 'most-popular') {
-  const filterQuery = buildFilterQuery(filters);
-
+  const cocktailIds = getCocktailIds(filters);
   const sortField = sortType === 'most-popular' ? { visitCount: -1 } : { ratingValue: -1 };
 
   const cocktails = await Database.collection('cocktails')
-    .find(filterQuery)
+    .find({ slug: { $in: Array.from(cocktailIds) } })
     .sort(sortField)
     .skip(skip)
     .limit(limit)
@@ -72,7 +105,6 @@ async function getCocktailSubsetByFilter(filters, skip, limit, sortType = 'most-
 }
 
 function filterToPath(filters) {
-  //alcohol-volume=slaboalkoholni/taste=yahidni,solodki/glassware=kelykh-dlia-irlandskoi-kavy/goods=med,tsukrovyi-pisok/tools=dzhyher
   let path = '';
   Object.keys(filters).sort().forEach((filterKey) => {
     filterValue = filters[filterKey].sort();
@@ -81,68 +113,58 @@ function filterToPath(filters) {
     }
   });
 
-  //remove last /
   path = path.slice(0, -1);
-
   return path;
 }
 
-
-const cacheCollectionName = 'filterCache';
-
-async function generateCacheKey(inputFilters, filterKey) {
-  return `${filterKey}-${JSON.stringify(inputFilters)}`;
-}
-
-async function getCacheFromDb(cacheKey) {
-  const cachedResult = await Database.collection(cacheCollectionName).findOne({ key: cacheKey });
-  return cachedResult ? cachedResult.value : null;
-}
-
-async function saveCacheToDb(cacheKey, value) {
-  await Database.collection(cacheCollectionName).updateOne(
-    { key: cacheKey },
-    { $set: { key: cacheKey, value: value, timestamp: new Date() } },
-    { upsert: true }
-  );
-}
-
-async function buildFutureCounter(inputFilters, filterKey, collectionName) {
-  const cacheKey = await generateCacheKey(inputFilters, filterKey);
-
-  // Check if the result is already in the cache collection
-  const cachedResult = await getCacheFromDb(cacheKey);
-  if (cachedResult) {
-    return cachedResult;
-  }
-
-  const allFilterValues = await Database.collection(collectionName).find().toArray();
+async function buildFutureCounter(inputFilters, filterKey) {
+  const mappedKey = keyMapping[filterKey];
+  const allFilterValues = Object.keys(filterCache[mappedKey]);
 
   const future = await Promise.all(allFilterValues.map(async (filterValue) => {
     const filters = structuredClone(inputFilters);
     const theFilterValue = filters[filterKey] || [];
 
-    const isInclude = theFilterValue.includes(filterValue.slug)
+    const isInclude = theFilterValue.includes(filterValue);
 
     if (filterKey === 'alcohol-volume' || filterKey === 'glassware') {
-      theFilterValue.splice(theFilterValue.indexOf(filterValue.slug), 1);
+      theFilterValue.splice(theFilterValue.indexOf(filterValue), 1);
     }
 
     if (isInclude) {
-      theFilterValue.splice(theFilterValue.indexOf(filterValue.slug), 1);
+      theFilterValue.splice(theFilterValue.indexOf(filterValue), 1);
     } else {
-      theFilterValue.push(filterValue.slug);
+      theFilterValue.push(filterValue);
     }
 
     const futureFilter = { ...filters, [filterKey]: theFilterValue };
+    // Clean up empty filter groups
+    Object.keys(futureFilter).forEach(key => {
+      if (futureFilter[key].length === 0) {
+        delete futureFilter[key];
+      }
+    });
+
+    if (Object.keys(futureFilter).length === 0) {
+      // return empty query and total cocktail count
+      const totalCount = await Database.collection('cocktails').countDocuments();
+
+      return {
+        id: filterSlugToIdMap[filterValue],
+        query: '',
+        count: totalCount,
+        isActive: false,
+        isAddToIndex: false,
+      };
+    }
 
     const futureSelectedFilterCount = Object.keys(futureFilter).reduce((acc, key) => acc + futureFilter[key].length, 0);
     const isAddToIndex = futureSelectedFilterCount < 3;
 
-    const count = await getCocktailCountByFilter(futureFilter);
+    const count = getCocktailIds(futureFilter).size;
 
     return {
-      id: filterValue.id,
+      id: filterSlugToIdMap[filterValue],
       query: filterToPath(futureFilter),
       count: count,
       isActive: isInclude,
@@ -150,23 +172,19 @@ async function buildFutureCounter(inputFilters, filterKey, collectionName) {
     };
   }));
 
-  const sortedFutures = future.sort((a, b) => b.count - a.count);
-
-  await saveCacheToDb(cacheKey, sortedFutures);
-
-  return sortedFutures;
+  return future.sort((a, b) => b.count - a.count);
 }
 
 async function getCocktailFilterState(filters, skip, limit, sortType) {
   const [totalCount, cocktails, alcoholVolumeFuture, tasteFuture, glasswareFuture, toolsFuture, goodsFuture, tagsFuture] = await Promise.all([
     getCocktailCountByFilter(filters),
     getCocktailSubsetByFilter(filters, skip, limit, sortType),
-    buildFutureCounter(filters, 'alcohol-volume', 'alcoholVolumes'),
-    buildFutureCounter(filters, 'taste', 'tastes'),
-    buildFutureCounter(filters, 'glassware', 'glassware'),
-    buildFutureCounter(filters, 'tools', 'tools'),
-    buildFutureCounter(filters, 'goods', 'goods'),
-    buildFutureCounter(filters, 'tags', 'tags')
+    buildFutureCounter(filters, 'alcohol-volume'),
+    buildFutureCounter(filters, 'taste'),
+    buildFutureCounter(filters, 'glassware'),
+    buildFutureCounter(filters, 'tools'),
+    buildFutureCounter(filters, 'goods'),
+    buildFutureCounter(filters, 'tags')
   ]);
 
   const selectedFilterCount = Object.keys(filters).reduce((acc, key) => acc + filters[key].length, 0);
@@ -186,6 +204,9 @@ async function getCocktailFilterState(filters, skip, limit, sortType) {
     isAddToIndex: isAddToIndex,
   }
 }
+
+// Initialize the filter cache when the application starts
+initializeFilterCache();
 
 module.exports = {
   getFullCocktailByFilter: getCocktailFilterState
