@@ -168,7 +168,7 @@ async function buildFutureCounter(inputFilters, filterKey) {
         id: filterSlugToIdMap[filterValue],
         query: '',
         count: totalCount,
-        isActive: false,
+        isActive: true,
         isAddToIndex: false,
       };
     }
