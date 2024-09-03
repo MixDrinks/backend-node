@@ -79,16 +79,31 @@ async function getCocktailCountByFilter(filters) {
 }
 
 async function getCocktailSubsetByFilter(filters, skip, limit, sortType = 'most-popular') {
-  const cocktailIds = getCocktailIds(filters);
   const sortField = sortType === 'most-popular' ? { visitCount: -1 } : { ratingValue: -1 };
 
-  const cocktails = await Database.collection('cocktails')
-    .find({ slug: { $in: Array.from(cocktailIds) } })
-    .sort(sortField)
-    .skip(skip)
-    .limit(limit)
-    .project({ _id: 0, id: 1, slug: 1, name: 1, ratingCount: 1, ratingValue: 1, visitCount: 1 })
-    .toArray();
+  let cocktails;
+  if (filters === undefined || Object.keys(filters).every(key => filters[key].length === 0)) {
+    // return all cocktails with paggnation and sorting
+
+    cocktails = await Database.collection('cocktails')
+      .find()
+      .sort(sortField)
+      .skip(skip)
+      .limit(limit)
+      .project({ _id: 0, id: 1, slug: 1, name: 1, ratingCount: 1, ratingValue: 1, visitCount: 1 })
+      .toArray();
+
+  } else {
+    const cocktailIds = getCocktailIds(filters);
+
+    cocktails = await Database.collection('cocktails')
+      .find({ slug: { $in: Array.from(cocktailIds) } })
+      .sort(sortField)
+      .skip(skip)
+      .limit(limit)
+      .project({ _id: 0, id: 1, slug: 1, name: 1, ratingCount: 1, ratingValue: 1, visitCount: 1 })
+      .toArray();
+  }
 
   cocktails.forEach(cocktail => {
     cocktail.images = buildImages(cocktail.id, 'COCKTAIL');
