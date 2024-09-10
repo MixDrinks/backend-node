@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express')
 const { getFullCocktailBySlug } = require("./utils");
-const { addVisitToCocktail, addRatingToCocktail  } = require("../../database/cocktailv2");
+const { addVisitToCocktail, addRatingToCocktail, getAllCocktails  } = require("../../database/cocktailv2");
 
 const router = express.Router();
 
@@ -39,6 +39,16 @@ router.post('/api/cocktail/:slug/score', async (req, res) => {
     return res.status(404).send('Cocktail not found');
   } else {
     return res.status(200).send({ 'slug': slug });
+  }
+});
+
+router.get('/api/cocktails/all', async (req, res) => {
+  const cocktails = await getAllCocktails();
+
+  if (!cocktails) {
+    return res.status(404).send('Cocktails not found');
+  } else {
+    return res.status(200).send(cocktails);
   }
 });
 

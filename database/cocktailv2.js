@@ -46,8 +46,17 @@ async function getScoreInfo(slug) {
   }
 }
 
+async function getAllCocktails() {
+  return Database.collection('cocktails').find(
+    {},
+  )
+    .project({ name: 1, slug: 1, _id: 0 })
+    .toArray();
+}
+
 module.exports = {
   addVisitToCocktail,
   addRatingToCocktail,
-  getScoreInfo
+  getScoreInfo,
+  getAllCocktails
 };
