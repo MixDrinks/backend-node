@@ -1,6 +1,8 @@
-// Function to build image objects
+require('dotenv').config();
+
+const imageUrlStart = process.env.IMAGE_URL_START;
+
 const buildImages = (id, type) => {
-  const domain = "https://newimages.mixdrinks.org/files";
   const types = {
     COCKTAIL: "cocktails",
     ITEM: "goods"
@@ -15,7 +17,7 @@ const buildImages = (id, type) => {
 
   return formats.flatMap(format =>
     sizes.map(size => ({
-      srcset: `${domain}/${types[type]}/${id}/${size.imageSize}/${id}.${format}`,
+      srcset: `${imageUrlStart}/${types[type]}/${id}/${size.imageSize}/${id}.${format}`,
       media: `screen and (min-width: ${size.responseSize}px)`,
       type: `image/${format}`
     }))

@@ -20,7 +20,11 @@ class DescriptionBuilder {
     description += await this.addGoodsDescriptionIfExist(filters['goods']);
     description += await this.addGlasswareDescriptionIfExist(filters['glassware']);
 
-    return description.trim().length > 0 && description.trim() !== 'коктейлі' ? description.trim() : null;
+    // trim string remove command and spaces at start and end of string
+    description = description.trim().replace(/(^\s*,)|(,\s*$)/g, '').replace(/^./, char => char.toUpperCase()).trim();
+
+    description = description.trim().length > 0 && description.trim() !== 'коктейлі' ? description.trim() : null;
+    return description;
   }
 
   async addGlasswareDescriptionIfExist(glasswareSlugs) {
