@@ -1,5 +1,6 @@
 const express = require('express')
 const { getFullCocktailByFilter } = require('../../database/filetrs');
+const { getFiltersData } = require('../../database/filters');
 const DescriptionBuilder = require('./description');
 const router = express.Router();
 
@@ -32,6 +33,18 @@ router.get('/api/filter/*', async (req, res) => {
   if (description) {
     response.description = description;
   }
+
+  return res.status(200).send(response);
+});
+
+const filterDataCache = {};
+
+router.get('/api/filters', async (req, res) => {
+  if (filterDataCache.data) {
+    return res.status(200).send(filterDataCache.data);
+  }
+  const response = await getFiltersData();
+  filterDataCache.data = response;
 
   return res.status(200).send(response);
 });
