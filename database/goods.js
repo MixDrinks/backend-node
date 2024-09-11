@@ -8,7 +8,6 @@ function getGoodBySlug(slug) {
   );
 }
 
-
 module.exports = {
   getGoodBySlug
 }

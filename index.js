@@ -10,6 +10,7 @@ const glasswareDetails = require('./features/glassware/rest');
 const toolDetails = require('./features/tools/rest');
 const goodDetails = require('./features/goods/rest');
 const filter = require('./features/filters/rest');
+const siteMap = require('./features/sitemap/rest');
 
 const app = express();
 const port = process.env.APP_PORT;
@@ -33,6 +34,7 @@ app.use(
   toolDetails,
   goodDetails,
   filter,
+  siteMap,
   service
 );
 
