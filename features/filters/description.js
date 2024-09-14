@@ -5,7 +5,7 @@ class DescriptionBuilder {
     let description = '';
 
     // Start building the description
-    description += await this.addAlcoholDescriptionIfExist(filters['alcohol-volume']);
+    description += await this.addAlcoholVolumeDescriptionIfExist(filters['alcohol-volume']);
 
     if (filters['taste']?.length > 0) {
       description += ', ';
@@ -16,6 +16,7 @@ class DescriptionBuilder {
     description += await this.addTasteDescriptionIfExist(filters['taste']);
     description += 'коктейлі'; // COCKTAIL_NAME
 
+    description += await this.addAlchoholDescriptionIfExist(filters['alcohol']);
     description += await this.addTagsDescriptionIfExist(filters['tags']);
     description += await this.addGoodsDescriptionIfExist(filters['goods']);
     description += await this.addGlasswareDescriptionIfExist(filters['glassware']);
@@ -24,6 +25,7 @@ class DescriptionBuilder {
     description = description.trim().replace(/(^\s*,)|(,\s*$)/g, '').replace(/^./, char => char.toUpperCase()).trim();
 
     description = description.trim().length > 0 && description.trim() !== 'коктейлі' ? description.trim() : null;
+    description = description ? description.charAt(0).toUpperCase() + description.slice(1).toLowerCase() : null;
     return description;
   }
 
@@ -58,6 +60,17 @@ class DescriptionBuilder {
     return '';
   }
 
+  async addAlchoholDescriptionIfExist(alcoholSlugs) {
+    console.log('alcoholSlugs', alcoholSlugs);
+    if (alcoholSlugs?.length > 0) {
+      const alcohols = await Database.collection('alcohol').find({ slug: { $in: alcoholSlugs } }).toArray();
+      if (alcohols.length > 0) {
+        return ` з ${alcohols.map(t => this.capitalize(t.name)).join(', ')}`;
+      }
+    }
+    return '';
+  }
+
   async addTasteDescriptionIfExist(tasteSlugs) {
     if (tasteSlugs?.length > 0) {
       const tastes = await Database.collection('tastes').find({ slug: { $in: tasteSlugs } }).toArray();
@@ -68,7 +81,7 @@ class DescriptionBuilder {
     return '';
   }
 
-  async addAlcoholDescriptionIfExist(alcoholSlugs) {
+  async addAlcoholVolumeDescriptionIfExist(alcoholSlugs) {
     if (alcoholSlugs?.length > 0) {
       const alcoholSlug = alcoholSlugs[0];
       const alcoholVolume = await Database.collection('alcoholVolumes').findOne({ slug: alcoholSlug });

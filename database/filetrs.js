@@ -8,6 +8,7 @@ const filterCache = {
   goods: {},
   tools: {},
   tags: {},
+  alcohol: {},
 };
 
 const filterSlugToIdMap = {}
@@ -19,6 +20,7 @@ const keyMapping = {
   goods: 'goods',
   tools: 'tools',
   tags: 'tags',
+  alcohol: 'alcohol',
 };
 
 async function initializeFilterCache() {
@@ -28,6 +30,7 @@ async function initializeFilterCache() {
   const goods = await Database.collection('goods').find().toArray();
   const tools = await Database.collection('tools').find().toArray();
   const tags = await Database.collection('tags').find().toArray();
+  const alcohol = await Database.collection('alcohol').find().toArray();
 
   alcoholVolumes.forEach(av => filterCache.alcoholVolumes[av.slug] = new Set(av.cocktailSlugs));
   tastes.forEach(taste => filterCache.tastes[taste.slug] = new Set(taste.cocktailSlugs));
@@ -35,6 +38,7 @@ async function initializeFilterCache() {
   goods.forEach(good => filterCache.goods[good.slug] = new Set(good.cocktailSlugs));
   tools.forEach(tool => filterCache.tools[tool.slug] = new Set(tool.cocktailSlugs));
   tags.forEach(tag => filterCache.tags[tag.slug] = new Set(tag.cocktailSlugs));
+  alcohol.forEach(al => filterCache.alcohol[al.slug] = new Set(al.cocktailSlugs));
 
   alcoholVolumes.forEach(av => filterSlugToIdMap[av.slug] = av.id);
   tastes.forEach(taste => filterSlugToIdMap[taste.slug] = taste.id);
@@ -42,6 +46,7 @@ async function initializeFilterCache() {
   goods.forEach(good => filterSlugToIdMap[good.slug] = good.id);
   tools.forEach(tool => filterSlugToIdMap[tool.slug] = tool.id);
   tags.forEach(tag => filterSlugToIdMap[tag.slug] = tag.id);
+  alcohol.forEach(al => filterSlugToIdMap[al.slug] = al.id);
 
   console.log("Filter cache initialized");
 }
@@ -161,7 +166,6 @@ async function buildFutureCounter(inputFilters, filterKey) {
     });
 
     if (Object.keys(futureFilter).length === 0) {
-      // return empty query and total cocktail count
       const totalCount = await Database.collection('cocktails').countDocuments();
 
       return {
@@ -191,7 +195,7 @@ async function buildFutureCounter(inputFilters, filterKey) {
 }
 
 async function getCocktailFilterState(filters, skip, limit, sortType) {
-  const [totalCount, cocktails, alcoholVolumeFuture, tasteFuture, glasswareFuture, toolsFuture, goodsFuture, tagsFuture] = await Promise.all([
+  const [totalCount, cocktails, alcoholVolumeFuture, tasteFuture, glasswareFuture, toolsFuture, goodsFuture, tagsFuture, alcoholFuture] = await Promise.all([
     getCocktailCountByFilter(filters),
     getCocktailSubsetByFilter(filters, skip, limit, sortType),
     buildFutureCounter(filters, 'alcohol-volume'),
@@ -199,7 +203,8 @@ async function getCocktailFilterState(filters, skip, limit, sortType) {
     buildFutureCounter(filters, 'glassware'),
     buildFutureCounter(filters, 'tools'),
     buildFutureCounter(filters, 'goods'),
-    buildFutureCounter(filters, 'tags')
+    buildFutureCounter(filters, 'tags'),
+    buildFutureCounter(filters, 'alcohol'),
   ]);
 
   const selectedFilterCount = Object.keys(filters).reduce((acc, key) => acc + filters[key].length, 0);
@@ -215,6 +220,7 @@ async function getCocktailFilterState(filters, skip, limit, sortType) {
       3: tasteFuture,
       4: alcoholVolumeFuture,
       5: glasswareFuture,
+      6: alcoholFuture,
     },
     isAddToIndex: isAddToIndex,
   }

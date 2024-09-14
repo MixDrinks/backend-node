@@ -45,6 +45,13 @@ async function getAllAlcoholVolumeSlug() {
     .toArray();
 }
 
+async function getAllAlcoholSlugs() {
+  return Database.collection('alcohol')
+    .find({}, { slug: 1 })
+    .toArray();
+}
+
+
 router.get('/api/sitemap', async (req, res) => {
   const cocktails = (await getAllCocktailsSlug()).map((cocktail) => `cocktails/${cocktail.slug}`);
   const goods = (await getAllGoodsSlug()).map((good) => `goods/${good.slug}`);
@@ -56,18 +63,20 @@ router.get('/api/sitemap', async (req, res) => {
   const tastsFilter = (await getAllTastesSlug()).map((tag) => `taste=${tag.slug}`);
   const alcoholVolumeFilter = (await getAllAlcoholVolumeSlug()).map((tag) => `alcohol-volume=${tag.slug}`);
   const glasswareFilter = (await getAllGlasswareSlug()).map((glass) => `glassware=${glass.slug}`);
-  
+  const alcoholFilter = (await getAllAlcoholSlugs()).map((alcohol) => `alcohol=${alcohol.slug}`);
+
 
   const urls = cocktails
     .concat(goods)
     .concat(tools)
     .concat(glassware)
-  .concat(tagsFilter)
-  .concat(goodsFilter)
-  .concat(toolsFilter)
-  .concat(tastsFilter)
-  .concat(alcoholVolumeFilter)
-  .concat(glasswareFilter);
+    .concat(tagsFilter)
+    .concat(goodsFilter)
+    .concat(toolsFilter)
+    .concat(tastsFilter)
+    .concat(alcoholVolumeFilter)
+    .concat(glasswareFilter)
+    .concat(alcoholFilter);
 
   return res.status(200).send(urls);
 });

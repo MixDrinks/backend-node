@@ -120,12 +120,40 @@ async function getToolsData() {
   return tools;
 }
 
+async function getAlcohole() {
+  const alcohol = await Database
+    .collection('alcohol')
+    .aggregate([
+      {
+        $project: {
+          _id: 0,
+          id: 1,
+          name: 1,
+          slug: 1,
+          count: { $size: "$cocktailSlugs" }
+        }
+      },
+      { $sort: { count: -1 } }
+    ])
+    .toArray();
+
+  return alcohol;
+}
+
 async function getFiltersData() {
   return [
     {
+      id: 6,
+      queryName: 'alcohol',
+      name: 'Алкоголь',
+      items: await getAlcohole(),
+      selectionType: 'MULTIPLE',
+      sortOrder: 2,
+    },
+    {
       id: 4,
       queryName: 'alcohol-volume',
-      name: 'Алкоголь',
+      name: 'Міцність',
       items: await getAlcoholoVolume(),
       selectionType: 'SINGLE',
       sortOrder: 1,
@@ -136,7 +164,7 @@ async function getFiltersData() {
       name: 'Смак',
       items: await getTastes(),
       selectionType: 'MULTIPLE',
-      sortOrder: 2,
+      sortOrder: 3,
     },
     {
       id: 5,
@@ -144,7 +172,7 @@ async function getFiltersData() {
       name: 'Стакан',
       items: await getGlasswares(),
       selectionType: 'SINGLE',
-      sortOrder: 3,
+      sortOrder: 4,
     },
     {
       id: 1,
@@ -152,7 +180,7 @@ async function getFiltersData() {
       name: 'Інгрідієнти',
       items: await getGoods(),
       selectionType: 'MULTIPLE',
-      sortOrder: 4,
+      sortOrder: 5,
     },
     {
       id: 0,
@@ -160,7 +188,7 @@ async function getFiltersData() {
       name: 'Інше',
       items: await getTagsData(),
       selectionType: 'MULTIPLE',
-      sortOrder: 5,
+      sortOrder: 6,
     },
     {
       id: 2,
@@ -168,7 +196,7 @@ async function getFiltersData() {
       name: 'Приладдя',
       items: await getToolsData(),
       selectionType: 'MULTIPLE',
-      sortOrder: 6,
+      sortOrder: 7,
     }
   ]
 }
