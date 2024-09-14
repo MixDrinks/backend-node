@@ -24,6 +24,16 @@ const buildImages = (id, type) => {
   );
 };
 
+const buildOgImage = (id, type) => {
+  const types = {
+    COCKTAIL: "cocktails",
+    ITEM: "goods"
+  };
+
+  return `${imageUrlStart}/${types[type]}/${id}/256/${id}.jpg`;
+};
+
 module.exports = {
-  buildImages
+  buildImages,
+  buildOgImage,
 }

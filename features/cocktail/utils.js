@@ -1,4 +1,4 @@
-const { buildImages } = require("../../utils/image");
+const { buildImages, buildOgImage } = require("../../utils/image");
 const { getCocktailBySlug } = require("../../database/cocktail");
 
 async function getFullCocktailBySlug(slug) {
@@ -55,6 +55,10 @@ async function getFullCocktailBySlug(slug) {
       ratting = null;
     }
 
+    const meta = {
+      ogImage: buildOgImage(cocktail.id, 'COCKTAIL'),
+    }
+
     return {
       id: cocktail.id,
       slug: cocktail.slug,
@@ -63,6 +67,7 @@ async function getFullCocktailBySlug(slug) {
       rating: ratting,
       ratingCount: cocktail.ratingCount,
       receipt: cocktail.recipe,
+      meta: meta,
       images: cocktailImages,
       goods: goods,
       tools: glassware.concat(tools),
