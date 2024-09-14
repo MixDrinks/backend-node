@@ -143,20 +143,12 @@ async function getAlcohole() {
 async function getFiltersData() {
   return [
     {
-      id: 6,
-      queryName: 'alcohol',
-      name: 'Алкоголь',
-      items: await getAlcohole(),
-      selectionType: 'MULTIPLE',
-      sortOrder: 2,
-    },
-    {
       id: 4,
       queryName: 'alcohol-volume',
       name: 'Міцність',
       items: await getAlcoholoVolume(),
       selectionType: 'SINGLE',
-      sortOrder: 1,
+      isOpen: true,
     },
     {
       id: 3,
@@ -164,15 +156,7 @@ async function getFiltersData() {
       name: 'Смак',
       items: await getTastes(),
       selectionType: 'MULTIPLE',
-      sortOrder: 3,
-    },
-    {
-      id: 5,
-      queryName: 'glassware',
-      name: 'Стакан',
-      items: await getGlasswares(),
-      selectionType: 'SINGLE',
-      sortOrder: 4,
+      isOpen: false,
     },
     {
       id: 1,
@@ -180,15 +164,23 @@ async function getFiltersData() {
       name: 'Інгрідієнти',
       items: await getGoods(),
       selectionType: 'MULTIPLE',
-      sortOrder: 5,
+      isOpen: false,
     },
     {
-      id: 0,
-      queryName: 'tags',
-      name: 'Інше',
-      items: await getTagsData(),
+      id: 6,
+      queryName: 'alcohol',
+      name: 'Категорія алкоголю',
+      items: await getAlcohole(),
       selectionType: 'MULTIPLE',
-      sortOrder: 6,
+      isOpen: false,
+    },
+    {
+      id: 5,
+      queryName: 'glassware',
+      name: 'Стакан',
+      items: await getGlasswares(),
+      selectionType: 'SINGLE',
+      isOpen: false,
     },
     {
       id: 2,
@@ -196,8 +188,16 @@ async function getFiltersData() {
       name: 'Приладдя',
       items: await getToolsData(),
       selectionType: 'MULTIPLE',
-      sortOrder: 7,
-    }
+      isOpen: false,
+    },
+    {
+      id: 0,
+      queryName: 'tags',
+      name: 'Інше',
+      items: await getTagsData(),
+      selectionType: 'MULTIPLE',
+      isOpen: false,
+    },
   ]
 }
 

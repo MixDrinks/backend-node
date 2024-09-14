@@ -61,7 +61,6 @@ class DescriptionBuilder {
   }
 
   async addAlchoholDescriptionIfExist(alcoholSlugs) {
-    console.log('alcoholSlugs', alcoholSlugs);
     if (alcoholSlugs?.length > 0) {
       const alcohols = await Database.collection('alcohol').find({ slug: { $in: alcoholSlugs } }).toArray();
       if (alcohols.length > 0) {
