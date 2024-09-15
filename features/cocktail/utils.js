@@ -59,6 +59,17 @@ async function getFullCocktailBySlug(slug) {
       ogImage: buildOgImage(cocktail.id, 'COCKTAIL'),
     }
 
+    const rawText = cocktail.article?.chapters;
+
+    let article = null;
+    if (!rawText || rawText === '') {
+      article = null;
+    } else {
+      article = {
+        chapters: rawText
+      }
+    }
+
     return {
       id: cocktail.id,
       slug: cocktail.slug,
@@ -72,6 +83,7 @@ async function getFullCocktailBySlug(slug) {
       goods: goods,
       tools: glassware.concat(tools),
       tags: taste.concat(tags),
+      article: article,
     };
   } catch (error) {
     return null;
