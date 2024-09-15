@@ -2,38 +2,42 @@ const { buildImages, buildOgImage } = require("../../utils/image");
 const Database = require('../../database/newclient');
 const { getCocktailBySlug } = require("../../database/cocktail");
 
-async function getRecomendations(cocktail) {
-  const goodMatchSlugs = cocktail.matches.good || [];
-  const otherMatchSlugs = cocktail.matches.other || [];
+async function getRecommendations(cocktail) {
+  const maxRecommendations = 20;
+  const classCocktailSlugs = [
+    cocktail.matchesV2.class1 || [],
+    cocktail.matchesV2.class2 || [],
+    cocktail.matchesV2.class3 || [],
+    cocktail.matchesV2.class4 || [],
+    cocktail.matchesV2.class5 || [],
+    cocktail.matchesV2.class6 || []
+  ];
 
-  const goodCocktails = await Database.collection('cocktails')
-    .find({ slug: { $in: Array.from(goodMatchSlugs) } })
-    .sort({ visitCount: -1 })
-    .limit(20)
-    .project({ _id: 0, id: 1, slug: 1, name: 1, ratingCount: 1, ratingValue: 1, visitCount: 1 })
-    .toArray();
+  const recommendationCocktails = [];
 
-  const otherCocktails = await Database.collection('cocktails')
-    .find({ slug: { $in: Array.from(otherMatchSlugs) } })
-    .sort({ visitCount: -1 })
-    .limit(20)
-    .project({ _id: 0, id: 1, slug: 1, name: 1, ratingCount: 1, ratingValue: 1, visitCount: 1 })
-    .toArray();
+  for (const slugs of classCocktailSlugs) {
+    if (recommendationCocktails.length >= maxRecommendations) break;
+    
+    const countToFull = maxRecommendations - recommendationCocktails.length;
 
-  const cocktails = goodCocktails.concat(otherCocktails).slice(0, 20);
+    const classCocktails = await Database.collection('cocktails')
+      .find({ slug: { $in: slugs } })
+      .sort({ visitCount: -1 })
+      .limit(countToFull)
+      .project({ _id: 0, id: 1, slug: 1, name: 1, ratingCount: 1, ratingValue: 1, visitCount: 1 })
+      .toArray();
 
-  cocktails.forEach(cocktail => {
+    recommendationCocktails.push(...classCocktails);
+  }
+
+  recommendationCocktails.forEach(cocktail => {
     cocktail.images = buildImages(cocktail.id, 'COCKTAIL');
-
-    cocktail.rating = cocktail.ratingCount ? cocktail.ratingValue / cocktail.ratingCount : 0;
-    if (cocktail.rating === 0) {
-      cocktail.rating = null;
-    }
+    cocktail.rating = cocktail.ratingCount ? cocktail.ratingValue / cocktail.ratingCount : null;
     delete cocktail.ratingCount;
     delete cocktail.ratingValue;
   });
 
-  return cocktails;
+  return recommendationCocktails;
 }
 
 async function getFullCocktailBySlug(slug) {
@@ -132,7 +136,7 @@ async function getFullCocktailBySlug(slug) {
       tools: glassware.concat(tools),
       tags: taste.concat(tags).concat(alcohols).concat([alcoholVolumeTag]),
       article: article,
-      recomendationCocktails: await getRecomendations(cocktail),
+      recomendationCocktails: await getRecommendations(cocktail),
     };
   } catch (error) {
     console.error(error);
