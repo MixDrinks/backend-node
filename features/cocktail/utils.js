@@ -50,6 +50,12 @@ async function getFullCocktailBySlug(slug) {
       slug: tag.slug
     }))
 
+    const alcohols = cocktail.alcohols?.map(alcohol => ({
+      name: alcohol.name,
+      url: `alcohol=${alcohol.slug}`,
+      slug: alcohol.slug
+    })) || [];
+
     let ratting = cocktail.ratingCount ? cocktail.ratingValue / cocktail.ratingCount : 0;
     if (ratting === 0) {
       ratting = null;
@@ -82,10 +88,11 @@ async function getFullCocktailBySlug(slug) {
       images: cocktailImages,
       goods: goods,
       tools: glassware.concat(tools),
-      tags: taste.concat(tags),
+      tags: taste.concat(tags).concat(alcohols),
       article: article,
     };
   } catch (error) {
+    console.error(error);
     return null;
   }
 }
