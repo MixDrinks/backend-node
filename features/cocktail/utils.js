@@ -3,8 +3,8 @@ const Database = require('../../database/newclient');
 const { getCocktailBySlug } = require("../../database/cocktail");
 
 async function getRecomendations(cocktail) {
-  const goodMatchSlugs = cocktail.matches.good;
-  const otherMatchSlugs = cocktail.matches.other;
+  const goodMatchSlugs = cocktail.matches.good || [];
+  const otherMatchSlugs = cocktail.matches.other || [];
 
   const goodCocktails = await Database.collection('cocktails')
     .find({ slug: { $in: Array.from(goodMatchSlugs) } })
