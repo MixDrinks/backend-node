@@ -1,5 +1,40 @@
 const { buildImages, buildOgImage } = require("../../utils/image");
+const Database = require('../../database/newclient');
 const { getCocktailBySlug } = require("../../database/cocktail");
+
+async function getRecomendations(cocktail) {
+  const goodMatchSlugs = cocktail.matches.good;
+  const otherMatchSlugs = cocktail.matches.other;
+
+  const goodCocktails = await Database.collection('cocktails')
+    .find({ slug: { $in: Array.from(goodMatchSlugs) } })
+    .sort({ visitCount: -1 })
+    .limit(20)
+    .project({ _id: 0, id: 1, slug: 1, name: 1, ratingCount: 1, ratingValue: 1, visitCount: 1 })
+    .toArray();
+
+  const otherCocktails = await Database.collection('cocktails')
+    .find({ slug: { $in: Array.from(otherMatchSlugs) } })
+    .sort({ visitCount: -1 })
+    .limit(20)
+    .project({ _id: 0, id: 1, slug: 1, name: 1, ratingCount: 1, ratingValue: 1, visitCount: 1 })
+    .toArray();
+
+  const cocktails = goodCocktails.concat(otherCocktails).slice(0, 20);
+
+  cocktails.forEach(cocktail => {
+    cocktail.images = buildImages(cocktail.id, 'COCKTAIL');
+
+    cocktail.rating = cocktail.ratingCount ? cocktail.ratingValue / cocktail.ratingCount : 0;
+    if (cocktail.rating === 0) {
+      cocktail.rating = null;
+    }
+    delete cocktail.ratingCount;
+    delete cocktail.ratingValue;
+  });
+
+  return cocktails;
+}
 
 async function getFullCocktailBySlug(slug) {
   try {
@@ -97,6 +132,7 @@ async function getFullCocktailBySlug(slug) {
       tools: glassware.concat(tools),
       tags: taste.concat(tags).concat(alcohols).concat([alcoholVolumeTag]),
       article: article,
+      recomendationCocktails: await getRecomendations(cocktail),
     };
   } catch (error) {
     console.error(error);

@@ -62,7 +62,7 @@ const CocktailSchema = new Schema({
 const Cocktail = mongoose.model('Cocktail', CocktailSchema);
 
 async function getCocktailBySlug(slug) {
-  return Cocktail.findOne({slug}).lean();
+  return Cocktail.findOne({ slug }).lean();
 }
 
 module.exports = {

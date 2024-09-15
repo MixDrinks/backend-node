@@ -41,7 +41,7 @@ const filterDataCache = {};
 
 router.get('/api/filters', async (req, res) => {
   if (filterDataCache.data) {
-   // return res.status(200).send(filterDataCache.data);
+    return res.status(200).send(filterDataCache.data);
   }
   const response = await getFiltersData();
   filterDataCache.data = response;
