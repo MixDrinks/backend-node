@@ -11,6 +11,7 @@ const toolDetails = require('./features/tools/rest');
 const goodDetails = require('./features/goods/rest');
 const filter = require('./features/filters/rest');
 const siteMap = require('./features/sitemap/rest');
+const { checkIsUrlNeedRedirect } = require('./features/redirects/check');
 
 const app = express();
 const port = process.env.APP_PORT;
@@ -25,6 +26,22 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+async function redirectIfXUserPath(req, res, next) {
+  const xUserPath = req.headers['x-user-path'];
+
+  if (xUserPath) {
+    const redirect = await checkIsUrlNeedRedirect(xUserPath)
+
+    if (redirect.isRedirect == true) {
+      return res.status(200).json({ redirect: redirect.to });
+    }
+  }
+  next();
+}
+
+// Use the middleware in your Express app
+app.use(redirectIfXUserPath);
 
 app.use(
   postListRoutes,
