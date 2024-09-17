@@ -84,41 +84,59 @@ async function getCocktailCountByFilter(filters) {
 }
 
 async function getCocktailSubsetByFilter(filters, skip, limit, sortType = 'most-popular') {
-  const sortField = sortType === 'most-popular' ? { visitCount: -1 } : { ratingValue: -1 };
-
   let cocktails;
-  if (filters === undefined || Object.keys(filters).every(key => filters[key].length === 0)) {
-    // return all cocktails with paggnation and sorting
 
-    cocktails = await Database.collection('cocktails')
-      .find()
-      .sort(sortField)
-      .skip(skip)
-      .limit(limit)
-      .project({ _id: 0, id: 1, slug: 1, name: 1, ratingCount: 1, ratingValue: 1, visitCount: 1 })
-      .toArray();
+  const matchStage = {
+    $match: {
+      ...(filters && Object.keys(filters).length > 0
+        ? { slug: { $in: Array.from(getCocktailIds(filters)) } }
+        : {}) // Add filter condition if filters are present
+    }
+  };
 
-  } else {
-    const cocktailIds = getCocktailIds(filters);
+  const addFieldsStage = {
+    $addFields: {
+      ratingScore: {
+        $cond: {
+          if: { $gt: [{ $ifNull: ["$ratingCount", 0] }, 0] }, // Check if ratingCount > 0, else default to 0
+          then: { $divide: [{ $ifNull: ["$ratingValue", 0] }, { $ifNull: ["$ratingCount", 1] }] }, // Safely divide ratingValue by ratingCount, default to 0/1
+          else: 0 // If ratingCount is 0 or missing, set ratingScore to 0
+        }
+      }
+    }
+  };
 
-    cocktails = await Database.collection('cocktails')
-      .find({ slug: { $in: Array.from(cocktailIds) } })
-      .sort(sortField)
-      .skip(skip)
-      .limit(limit)
-      .project({ _id: 0, id: 1, slug: 1, name: 1, ratingCount: 1, ratingValue: 1, visitCount: 1 })
-      .toArray();
-  }
+  const sortStage = {
+    $sort: sortType === 'most-popular'
+      ? { visitCount: -1 }
+      : { ratingScore: -1 }
+  };
+
+  const projectStage = {
+    $project: {
+      _id: 0,
+      id: 1,
+      slug: 1,
+      name: 1,
+      visitCount: 1,
+      ratingScore: 1
+    }
+  };
+
+  cocktails = await Database.collection('cocktails').aggregate([
+    matchStage,
+    addFieldsStage,
+    sortStage,
+    { $skip: skip },
+    { $limit: limit },
+    projectStage
+  ]).toArray();
 
   cocktails.forEach(cocktail => {
+    cocktail.rating = cocktail.ratingScore;
     cocktail.images = buildImages(cocktail.id, 'COCKTAIL');
 
-    cocktail.rating = cocktail.ratingCount ? cocktail.ratingValue / cocktail.ratingCount : 0;
-    if (cocktail.rating === 0) {
-      cocktail.rating = null;
-    }
-    delete cocktail.ratingCount;
-    delete cocktail.ratingValue;
+    delete cocktail.ratingScore;
   });
 
   return cocktails;
