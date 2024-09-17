@@ -119,7 +119,8 @@ async function getCocktailSubsetByFilter(filters, skip, limit, sortType = 'most-
       slug: 1,
       name: 1,
       visitCount: 1,
-      ratingScore: 1
+      ratingScore: 1,
+      ratingCount: 1,
     }
   };
 
