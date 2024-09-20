@@ -8,6 +8,8 @@ const router = express.Router();
 router.get('/api/filter/*', async (req, res) => {
   //Getting query sort=most-popular&page=0
   const sortType = req.query.sort;
+  const isRequestHasQuery = Object.keys(req.query).length > 0;
+
   const page = req.query.page || 0;
 
   const start = page * 24;
@@ -26,6 +28,10 @@ router.get('/api/filter/*', async (req, res) => {
   }
 
   const response = await getFullCocktailByFilter(filter, start, limit, sortType);
+  
+  if (isRequestHasQuery) {
+    response.isAddToIndex = false;
+  }
 
   const descriptionBuilder = new DescriptionBuilder();
   const description = await descriptionBuilder.buildDescription(filter);
