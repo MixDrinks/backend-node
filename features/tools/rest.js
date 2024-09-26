@@ -1,6 +1,6 @@
 const express = require('express');
 const { getToolBySlug } = require('../../database/tool');
-const { buildImages, buildOgImage } = require('../../utils/image');
+const { buildOgImage, buildToolDetailsImage } = require('../../utils/image');
 const router = express.Router();
 
 router.get('/api/tools/:slug', async (req, res) => {
@@ -17,7 +17,7 @@ router.get('/api/tools/:slug', async (req, res) => {
       slug: tool.slug,
       name: tool.name,
       about: tool.about,
-      images: buildImages(tool.id, 'ITEM'),
+      images: buildToolDetailsImage(tool.slug),
       meta: {
         ogImage: buildOgImage(tool.id, 'ITEM'),
       },

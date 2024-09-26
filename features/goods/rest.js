@@ -1,7 +1,7 @@
 
 const express = require('express');
 const { getGoodBySlug } = require('../../database/goods');
-const { buildImages, buildOgImage } = require('../../utils/image');
+const { buildOgImage, buildGoodDetailsImage } = require('../../utils/image');
 const router = express.Router();
 
 router.get('/api/goods/:slug', async (req, res) => {
@@ -16,7 +16,7 @@ router.get('/api/goods/:slug', async (req, res) => {
       slug: good.slug,
       name: good.name,
       about: good.about,
-      images: buildImages(good.id, 'ITEM'),
+      images: buildGoodDetailsImage(good.slug),
       meta: {
         ogImage: buildOgImage(good.id, 'ITEM'),
       },

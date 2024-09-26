@@ -51,8 +51,72 @@ const buildCocktailInListImage = (slug) => {
   );
 }
 
+const buildCocktailDetailsImage = (slug) => {
+  const sizes = [
+    { responseSize: "414px", imageSize: "500" },
+    { responseSize: "0", imageSize: "334" }
+  ];
+
+  return formats.flatMap(format =>
+    sizes.map(size => ({
+      srcset: `${imageUrlStart}/v2/cocktails/${slug}/${size.imageSize}.${format}`,
+      media: `screen and (min-width: ${size.responseSize})`,
+      type: `image/${format}`
+    }))
+  );
+}
+
+const buildGoodDetailsImage = (slug) => {
+  const sizes = [
+    { responseSize: "414px", imageSize: "500" },
+    { responseSize: "0", imageSize: "334" }
+  ];
+
+  return formats.flatMap(format =>
+    sizes.map(size => ({
+      srcset: `${imageUrlStart}/v2/goods/${slug}/${size.imageSize}.${format}`,
+      media: `screen and (min-width: ${size.responseSize})`,
+      type: `image/${format}`
+    }))
+  );
+}
+
+const buildToolDetailsImage = (slug) => {
+  const sizes = [
+    { responseSize: "414px", imageSize: "500" },
+    { responseSize: "0", imageSize: "334" }
+  ];
+
+  return formats.flatMap(format =>
+    sizes.map(size => ({
+      srcset: `${imageUrlStart}/v2/tools/${slug}/${size.imageSize}.${format}`,
+      media: `screen and (min-width: ${size.responseSize})`,
+      type: `image/${format}`
+    }))
+  );
+}
+
+const buildGlasswareDetailsImage = (slug) => {
+  const sizes = [
+    { responseSize: "414px", imageSize: "500" },
+    { responseSize: "0", imageSize: "334" }
+  ];
+
+  return formats.flatMap(format =>
+    sizes.map(size => ({
+      srcset: `${imageUrlStart}/v2/glassware/${slug}/${size.imageSize}.${format}`,
+      media: `screen and (min-width: ${size.responseSize})`,
+      type: `image/${format}`
+    }))
+  );
+}
+
 module.exports = {
   buildImages,
   buildOgImage,
   buildCocktailInListImage,
+  buildCocktailDetailsImage,
+  buildGoodDetailsImage,
+  buildToolDetailsImage,
+  buildGlasswareDetailsImage,
 }
