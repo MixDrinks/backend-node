@@ -1,4 +1,4 @@
-const { buildImages, buildOgImage, buildGoodsImageInFeed, buildGlasswaresImageInFeed, buildToolsImageInFeed } = require("../../utils/image");
+const { buildImages, buildOgImage, buildGoodsImageInFeed, buildGlasswaresImageInFeed, buildToolsImageInFeed, buildCocktailDetailsImage, buildRecommendationCocktailImage } = require("../../utils/image");
 const Database = require('../../database/newclient');
 const { getCocktailBySlug } = require("../../database/cocktail");
 
@@ -17,7 +17,7 @@ async function getRecommendations(cocktail) {
 
   for (const slugs of classCocktailSlugs) {
     if (recommendationCocktails.length >= maxRecommendations) break;
-    
+
     const countToFull = maxRecommendations - recommendationCocktails.length;
 
     const classCocktails = await Database.collection('cocktails')
@@ -31,7 +31,7 @@ async function getRecommendations(cocktail) {
   }
 
   recommendationCocktails.forEach(cocktail => {
-    cocktail.images = buildImages(cocktail.id, 'COCKTAIL');
+    cocktail.images = buildRecommendationCocktailImage(cocktail.slug);
     cocktail.rating = cocktail.ratingCount ? cocktail.ratingValue / cocktail.ratingCount : null;
     delete cocktail.ratingCount;
     delete cocktail.ratingValue;
@@ -48,7 +48,7 @@ async function getFullCocktailBySlug(slug) {
       return null;
     }
 
-    const cocktailImages = buildImages(cocktail.id, 'COCKTAIL');
+    const cocktailImages = buildCocktailDetailsImage(cocktail.slug);
     const goods = cocktail.goods.map(good => ({
       id: good.id,
       slug: good.slug,

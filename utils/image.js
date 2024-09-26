@@ -66,6 +66,21 @@ const buildCocktailDetailsImage = (slug) => {
   );
 }
 
+const buildRecommendationCocktailImage = (slug) => {
+  const sizes = [
+    { responseSize: "414px", imageSize: "146" },
+    { responseSize: "0", imageSize: "120" },
+  ]
+
+  return formats.flatMap(format =>
+    sizes.map(size => ({
+      srcset: `${imageUrlStart}/v2/cocktails/${slug}/${size.imageSize}.${format}`,
+      media: `screen and (min-width: ${size.responseSize})`,
+      type: `image/${format}`
+    }))
+  );
+}
+
 const buildGoodDetailsImage = (slug) => {
   const sizes = [
     { responseSize: "414px", imageSize: "500" },
@@ -167,4 +182,5 @@ module.exports = {
   buildGoodsImageInFeed,
   buildToolsImageInFeed,
   buildGlasswaresImageInFeed,
+  buildRecommendationCocktailImage,
 }
