@@ -135,8 +135,7 @@ async function getCocktailSubsetByFilter(filters, skip, limit, sortType = 'most-
 
   cocktails.forEach(cocktail => {
     cocktail.rating = cocktail.ratingScore;
-    cocktail.images = buildImages(cocktail.id, 'COCKTAIL');
-    cocktail.imagesV2 = buildCocktailInListImage(cocktail.slug);
+    cocktail.images = buildCocktailInListImage(cocktail.slug);
 
     delete cocktail.ratingScore;
   });
