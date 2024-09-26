@@ -1,4 +1,4 @@
-const { buildImages, buildOgImage } = require("../../utils/image");
+const { buildImages, buildOgImage, buildGoodsImageInFeed, buildGlasswaresImageInFeed, buildToolsImageInFeed } = require("../../utils/image");
 const Database = require('../../database/newclient');
 const { getCocktailBySlug } = require("../../database/cocktail");
 
@@ -56,7 +56,7 @@ async function getFullCocktailBySlug(slug) {
       name: good.name,
       amount: good.amount,
       unit: good.unit,
-      images: buildImages(good.id, 'ITEM')
+      images: buildGoodsImageInFeed(good.slug)
     }));
 
     const glassware = cocktail.glassware.map(glass => ({
@@ -64,7 +64,7 @@ async function getFullCocktailBySlug(slug) {
       slug: glass.slug,
       url: `glassware/${glass.slug}`,
       name: glass.name,
-      images: buildImages(glass.id, 'ITEM')
+      images: buildGlasswaresImageInFeed(glass.slug)
     }));
 
     const tools = cocktail.tools.map(tool => ({
@@ -72,7 +72,7 @@ async function getFullCocktailBySlug(slug) {
       slug: tool.slug,
       url: `tools/${tool.slug}`,
       name: tool.name,
-      images: buildImages(tool.id, 'ITEM')
+      images: buildToolsImageInFeed(tool.slug)
     }));
 
     const taste = cocktail.tastes.map(taste => ({

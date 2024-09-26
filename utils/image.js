@@ -111,6 +111,51 @@ const buildGlasswareDetailsImage = (slug) => {
   );
 }
 
+const buildGoodsImageInFeed = (slug) => {
+  const sizes = [
+    { responseSize: "414px", imageSize: "142" },
+    { responseSize: "0", imageSize: "100" }
+  ];
+
+  return formats.flatMap(format =>
+    sizes.map(size => ({
+      srcset: `${imageUrlStart}/v2/goods/${slug}/${size.imageSize}.${format}`,
+      media: `screen and (min-width: ${size.responseSize})`,
+      type: `image/${format}`
+    }))
+  );
+}
+
+const buildToolsImageInFeed = (slug) => {
+  const sizes = [
+    { responseSize: "414px", imageSize: "142" },
+    { responseSize: "0", imageSize: "100" }
+  ];
+
+  return formats.flatMap(format =>
+    sizes.map(size => ({
+      srcset: `${imageUrlStart}/v2/tools/${slug}/${size.imageSize}.${format}`,
+      media: `screen and (min-width: ${size.responseSize})`,
+      type: `image/${format}`
+    }))
+  );
+}
+
+const buildGlasswaresImageInFeed = (slug) => {
+  const sizes = [
+    { responseSize: "414px", imageSize: "142" },
+    { responseSize: "0", imageSize: "100" }
+  ];
+
+  return formats.flatMap(format =>
+    sizes.map(size => ({
+      srcset: `${imageUrlStart}/v2/glasswares/${slug}/${size.imageSize}.${format}`,
+      media: `screen and (min-width: ${size.responseSize})`,
+      type: `image/${format}`
+    }))
+  );
+}
+
 module.exports = {
   buildImages,
   buildOgImage,
@@ -119,4 +164,7 @@ module.exports = {
   buildGoodDetailsImage,
   buildToolDetailsImage,
   buildGlasswareDetailsImage,
+  buildGoodsImageInFeed,
+  buildToolsImageInFeed,
+  buildGlasswaresImageInFeed,
 }
