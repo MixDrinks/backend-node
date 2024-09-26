@@ -1,5 +1,5 @@
 const Database = require('./newclient');
-const { buildImages } = require("../utils/image");
+const { buildImages, buildCocktailInListImage } = require("../utils/image");
 
 const filterCache = {
   alcoholVolumes: {},
@@ -136,6 +136,7 @@ async function getCocktailSubsetByFilter(filters, skip, limit, sortType = 'most-
   cocktails.forEach(cocktail => {
     cocktail.rating = cocktail.ratingScore;
     cocktail.images = buildImages(cocktail.id, 'COCKTAIL');
+    cocktail.imagesV2 = buildCocktailInListImage(cocktail.slug);
 
     delete cocktail.ratingScore;
   });

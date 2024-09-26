@@ -1,13 +1,16 @@
+const { format } = require('express/lib/response');
+
 require('dotenv').config();
 
 const imageUrlStart = process.env.IMAGE_URL_START;
+
+const formats = ["webp", "jpg"];
 
 const buildImages = (id, type) => {
   const types = {
     COCKTAIL: "cocktails",
     ITEM: "goods"
   };
-  const formats = ["webp", "jpg"];
   const sizes = [
     { responseSize: "570", imageSize: "origin" },
     { responseSize: "410", imageSize: "560" },
@@ -33,7 +36,23 @@ const buildOgImage = (id, type) => {
   return `${imageUrlStart}/${types[type]}/${id}/256/${id}.jpg`;
 };
 
+const buildCocktailInListImage = (slug) => {
+  const sizes = [
+    { responseSize: "414px", imageSize: "300" },
+    { responseSize: "0", imageSize: "100" }
+  ];
+
+  return formats.flatMap(format =>
+    sizes.map(size => ({
+      srcset: `${imageUrlStart}/v2/cocktails/${slug}/${size.imageSize}.${format}`,
+      media: `screen and (min-width: ${size.responseSize})`,
+      type: `image/${format}`
+    }))
+  );
+}
+
 module.exports = {
   buildImages,
   buildOgImage,
+  buildCocktailInListImage,
 }
