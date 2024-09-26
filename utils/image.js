@@ -104,7 +104,7 @@ const buildGlasswareDetailsImage = (slug) => {
 
   return formats.flatMap(format =>
     sizes.map(size => ({
-      srcset: `${imageUrlStart}/v2/glassware/${slug}/${size.imageSize}.${format}`,
+      srcset: `${imageUrlStart}/v2/glasswares/${slug}/${size.imageSize}.${format}`,
       media: `screen and (min-width: ${size.responseSize})`,
       type: `image/${format}`
     }))
