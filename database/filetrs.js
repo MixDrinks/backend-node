@@ -108,8 +108,8 @@ async function getCocktailSubsetByFilter(filters, skip, limit, sortType = 'most-
 
   const sortStage = {
     $sort: sortType === 'most-popular'
-      ? { visitCount: -1 }
-      : { ratingScore: -1, ratingCount: -1, visitCount: -1 }
+      ? { visitCount: -1, id: -1 }
+      : { ratingScore: -1, ratingCount: -1, visitCount: -1, id: -1 }
   };
 
   const projectStage = {
