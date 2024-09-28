@@ -17,11 +17,12 @@ async function getRecommendations(cocktail) {
 
   for (const slugs of classCocktailSlugs) {
     if (recommendationCocktails.length >= maxRecommendations) break;
+    const slugsWithoutExist = slugs.filter(slug => !recommendationCocktails.some(cocktail => cocktail.slug === slug));
 
     const countToFull = maxRecommendations - recommendationCocktails.length;
 
     const classCocktails = await Database.collection('cocktails')
-      .find({ slug: { $in: slugs } })
+      .find({ slug: { $in: slugsWithoutExist } })
       .sort({ visitCount: -1 })
       .limit(countToFull)
       .project({ _id: 0, id: 1, slug: 1, name: 1, ratingCount: 1, ratingValue: 1, visitCount: 1 })
