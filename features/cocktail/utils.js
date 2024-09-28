@@ -3,7 +3,7 @@ const Database = require('../../database/newclient');
 const { getCocktailBySlug } = require("../../database/cocktail");
 
 async function getRecommendations(cocktail) {
-  const maxRecommendations = 20;
+  const maxRecommendations = 12;
   const classCocktailSlugs = [
     cocktail.matchesV2.class1 || [],
     cocktail.matchesV2.class2 || [],
