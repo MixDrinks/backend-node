@@ -1,3 +1,5 @@
+# This project has been archived, and all code can now be found in the [site repository](https://github.com/mixDrinks/site)
+------------
 # The backend service for [mixdrinks.org](https://mixdrinks.org/). The service for home cocktails cooking.
 
 [Our website](https://mixdrinks.org/)
